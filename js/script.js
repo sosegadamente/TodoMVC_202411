@@ -1,7 +1,7 @@
 class TodoApp{
   constructor() {
     this.isZero();
-    this.selectedFilter();
+    this.renderController();
     this.setEvents();
   }
 
@@ -15,7 +15,7 @@ class TodoApp{
 
   isZero() {
     this.getStorage().length === 0 ? $('footer').style.display = 'none' : $('footer').style.display = 'block';
-    if (this.getStorage().length === 0) $('.toggle-all').checked = false;
+    this.getStorage().length === 0 ? $('label[for="toggle-all"]').style.display = 'none' : $('label[for="toggle-all"]').style.display = 'block';
   }
 
   todoFormat(value) {
@@ -29,7 +29,7 @@ class TodoApp{
     const currentTodoList = this.getStorage();
     currentTodoList.push(formattedTodoForm);
     this.setStorage(currentTodoList);
-    this.selectedFilter();
+    this.renderController();
     this.isZero();
     $newTodo.value = "";
   }
@@ -46,11 +46,11 @@ class TodoApp{
 
   deleteTodo(event) {
     const currentTodoList = this.getStorage();
-    const deleteTarget = event.target.closest('.view').querySelector('label').textContent;
-    const updateTodoList = currentTodoList.filter(({ value }) => { return value !== deleteTarget });
+    const deleteTarget = +event.target.closest('.view').dataset.idx;
+    const updateTodoList = currentTodoList.filter(({ idx }) => { return idx !== deleteTarget });
     this.setStorage(updateTodoList);
     this.isZero();
-    this.selectedFilter();
+    this.renderController();
   }
 
   editTodo(event) {
@@ -60,7 +60,7 @@ class TodoApp{
     $input.classList.add("edit");
     $li.classList.add('editing');
     $li.append($input);
-    $input.onblur = (e) => { this.editBlur(e) };
+    $input.onblur = (e) => { this.editBlur(e) }
     $input.onkeydown = (e) => { this.updateStorage(e); }
   }
 
@@ -72,30 +72,30 @@ class TodoApp{
 
   updateStorage(event) {
     if (event.keyCode !== 13 || !event.target.value.trim()) return;
-    const $textContent = event.target.closest('li').querySelector('label').textContent;
+    const $textContent = event.target.closest('li').dataset.idx;
     const currentTodoList = this.getStorage();
     const updateTodoList = currentTodoList.map((item) => {
-      if (item.value === $textContent) item.value = event.target.value;
+      if (item.idx === $textContent) item.value = event.target.value;
       return item;
     });
     this.setStorage(updateTodoList);
-    this.selectedFilter();
+    this.renderController();
   }
 
   changeStatus(event) {
     const currentTodoList = this.getStorage();
-    const changeTarget = event.target.closest('.view').querySelector('label').textContent;
+    const changeTarget = +event.target.closest('.view').dataset.idx;
     const updateTodoList = currentTodoList.map((item) => {
-      if (item.value === changeTarget) { item.isFinished = !item.isFinished; }
+      if (item.idx === changeTarget) { item.isFinished = !item.isFinished; }
       return item;
     });
     this.setStorage(updateTodoList);
-    this.selectedFilter();
+    this.renderController();
   }
 
   toggleAllStatus() {
     const isAllFinished = this.getStorage().every(({ isFinished }) => { return isFinished == true });
-    isAllFinished ? $('.toggle-all').checked = true : $('.toggle-all').checked = false;
+    isAllFinished && this.getStorage().length > 0 ? $('.toggle-all').checked = true : $('.toggle-all').checked = false;
   }
 
   toggleAll() {
@@ -105,25 +105,25 @@ class TodoApp{
       item.isFinished = !isAllFinished;
     });
     this.setStorage(currentTodoList);
-    this.selectedFilter();
+    this.renderController();
   }
 
   clearCompleted() {
     const currentTodoList = this.getStorage();
     const updateTodoList = currentTodoList.filter(({ isFinished }) => { return isFinished == false; } )
     this.setStorage(updateTodoList);
-    this.selectedFilter();
+    this.renderController();
     this.isZero();
   }
 
   render(renderList = this.getStorage()) {
     const $todoList = $('.todo-list');
-    $todoList.innerHTML = ''
+    $todoList.innerHTML = '';
     renderList.forEach((todoItem) => {
       const $li = document.createElement('li');
       if (todoItem.isFinished == true) $li.classList.add('completed');
       $li.innerHTML = `
-        <div class="view">
+        <div class="view" data-idx=${todoItem.idx}>
           <input class="toggle" type="checkbox" ${todoItem.isFinished == true ? 'checked' : ''} />
           <label>${todoItem.value}</label>
           <button class="destroy"></button>
@@ -138,8 +138,8 @@ class TodoApp{
     this.numberLeftTodoList();
   }
 
-  selectedFilter() {
-    const $filters = [...$$('.filters li a')]
+  renderController() {
+    const $filters = [...$$('.filters li a')];
     $filters.forEach( $filter => $filter.classList.remove('selected') );
     const $selectedHref = $filters.find( $filter => $filter.href === location.href );
     $selectedHref ? $selectedHref.classList.add('selected') : $('a[href="#/"]').classList.add('selected');
@@ -157,7 +157,7 @@ class TodoApp{
     document.onkeydown = (e) => { this.addTodo(e); }
     $('.clear-completed').onclick = () => { this.clearCompleted(); }
     $('#toggle-all').onchange = () => { this.toggleAll(); }
-    window.onhashchange = () => { this.selectedFilter(); }
+    window.onhashchange = () => { this.renderController(); }
   }
 }
 

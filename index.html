@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko" data-framework="es6">
+  <head>
+    <meta charset="utf-8" />
+    <title>Vanilla ES6 • TodoMVC</title>
+    <link rel="stylesheet" href="./css/base.css" />
+    <link rel="stylesheet" href="./css/todoapp.css" />
+  </head>
+  <body>
+    <section class="todoapp">
+      <header class="header">
+        <h1>todos</h1>
+        <input
+          class="new-todo"
+          placeholder="What needs to be done?"
+          autofocus
+        />
+      </header>
+      <section class="main">
+        <input id="toggle-all" class="toggle-all" type="checkbox" />
+        <label for="toggle-all">Mark all as complete</label>
+        <ul class="todo-list">
+          <!-- <li>
+            <div class="view">
+              <input class="toggle" type="checkbox" />
+              <label>1</label>
+              <button class="destroy"></button>
+            </div>
+          </li>
+          <li class="completed">
+            <div class="view">
+              <input class="toggle" type="checkbox" checked />
+              <label>2</label>
+              <button class="destroy"></button>
+            </div>
+          </li>
+          <li class="editing">
+            <div class="view">
+              <input class="toggle" type="checkbox" checked />
+              <label>2</label>
+              <button class="destroy"></button>
+            </div>
+            <input class="edit" type="text" />
+          </li> -->
+        </ul>
+        <footer class="footer">
+          <span class="todo-count"><strong>4</strong> items left</span>
+          <ul class="filters">
+            <li>
+              <a href="#/" class="selected">All</a>
+            </li>
+            <li>
+              <a href="#/active">Active</a>
+            </li>
+            <li>
+              <a href="#/completed">Completed</a>
+            </li>
+          </ul>
+          <button class="clear-completed">Clear completed</button>
+        </footer>
+      </section>
+    </section>
+    <script src="./js/common.js"></script>
+    <script src="./js/script.js"></script>
+  </body>
+</html>

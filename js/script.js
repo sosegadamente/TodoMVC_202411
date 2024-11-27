@@ -38,9 +38,7 @@ class TodoApp{
     let incompletedList = [];
     const currentTodoList = this.getStorage();
     const $todoCount = $('.todo-count');
-    currentTodoList.forEach((item) => {
-      if (item.isFinished === false) incompletedList.push(item);
-    });
+    currentTodoList.forEach((item) => { if (item.isFinished === false) incompletedList.push(item); });
     incompletedList.length === 1 ? $todoCount.innerHTML = '<span class="todo-count"><strong>1</strong> item left</span>' : $todoCount.innerHTML = `<span class="todo-count"><strong>${incompletedList.length}</strong> items left</span>`;
   }
 
@@ -65,17 +63,16 @@ class TodoApp{
   }
 
   editBlur(event) {
-    console.log(event.target);
     event.target.closest('li').classList.remove('editing');
     event.target.remove();
   }
 
   updateStorage(event) {
     if (event.keyCode !== 13 || !event.target.value.trim()) return;
-    const $textContent = event.target.closest('li').dataset.idx;
+    const $dataIdx = +event.target.closest('li').querySelector('.view').dataset.idx;
     const currentTodoList = this.getStorage();
     const updateTodoList = currentTodoList.map((item) => {
-      if (item.idx === $textContent) item.value = event.target.value;
+      if (item.idx === $dataIdx) item.value = event.target.value;
       return item;
     });
     this.setStorage(updateTodoList);
@@ -101,9 +98,7 @@ class TodoApp{
   toggleAll() {
     const currentTodoList = this.getStorage();
     const isAllFinished = currentTodoList.every(({ isFinished }) => isFinished == true );
-    currentTodoList.forEach((item) => {
-      item.isFinished = !isAllFinished;
-    });
+    currentTodoList.forEach((item) => { item.isFinished = !isAllFinished; });
     this.setStorage(currentTodoList);
     this.renderController();
   }
@@ -114,6 +109,15 @@ class TodoApp{
     this.setStorage(updateTodoList);
     this.renderController();
     this.isZero();
+  }
+
+  renderController() {
+    const $filters = [...$$('.filters li a')];
+    $filters.forEach( $filter => $filter.classList.remove('selected') );
+    const $selectedHref = $filters.find( $filter => $filter.href === location.href );
+    $selectedHref ? $selectedHref.classList.add('selected') : $('a[href="#/"]').classList.add('selected');
+    if ($('a.selected').textContent === "All") return this.render();
+    return this.renderWithFiltering();
   }
 
   render(renderList = this.getStorage()) {
@@ -136,15 +140,6 @@ class TodoApp{
     });
     this.toggleAllStatus();
     this.numberLeftTodoList();
-  }
-
-  renderController() {
-    const $filters = [...$$('.filters li a')];
-    $filters.forEach( $filter => $filter.classList.remove('selected') );
-    const $selectedHref = $filters.find( $filter => $filter.href === location.href );
-    $selectedHref ? $selectedHref.classList.add('selected') : $('a[href="#/"]').classList.add('selected');
-    if ($('a.selected').textContent === "All") return this.render();
-    this.renderWithFiltering();
   }
 
   renderWithFiltering() {

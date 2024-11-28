@@ -58,7 +58,7 @@ class TodoApp{
     $input.classList.add("edit");
     $li.classList.add('editing');
     $li.append($input);
-    $input.onblur = (e) => { this.editBlur(e) }
+    $input.onblur = (e) => { this.editBlur(e); }
     $input.onkeydown = (e) => { this.updateStorage(e); }
   }
 
@@ -83,7 +83,7 @@ class TodoApp{
     const currentTodoList = this.getStorage();
     const changeTarget = +event.target.closest('.view').dataset.idx;
     const updateTodoList = currentTodoList.map((item) => {
-      if (item.idx === changeTarget) { item.isFinished = !item.isFinished; }
+      if (item.idx === changeTarget) item.isFinished = !item.isFinished;
       return item;
     });
     this.setStorage(updateTodoList);
@@ -91,13 +91,13 @@ class TodoApp{
   }
 
   toggleAllStatus() {
-    const isAllFinished = this.getStorage().every(({ isFinished }) => { return isFinished == true });
+    const isAllFinished = this.getStorage().every(({ isFinished }) => { return isFinished === true });
     isAllFinished && this.getStorage().length > 0 ? $('.toggle-all').checked = true : $('.toggle-all').checked = false;
   }
 
   toggleAll() {
     const currentTodoList = this.getStorage();
-    const isAllFinished = currentTodoList.every(({ isFinished }) => isFinished == true );
+    const isAllFinished = currentTodoList.every(({ isFinished }) => isFinished === true );
     currentTodoList.forEach((item) => { item.isFinished = !isAllFinished; });
     this.setStorage(currentTodoList);
     this.renderController();
@@ -105,7 +105,7 @@ class TodoApp{
 
   clearCompleted() {
     const currentTodoList = this.getStorage();
-    const updateTodoList = currentTodoList.filter(({ isFinished }) => { return isFinished == false; } )
+    const updateTodoList = currentTodoList.filter(({ isFinished }) => { return isFinished === false; });
     this.setStorage(updateTodoList);
     this.renderController();
     this.isZero();
@@ -113,7 +113,7 @@ class TodoApp{
 
   renderController() {
     const $filters = [...$$('.filters li a')];
-    $filters.forEach( $filter => $filter.classList.remove('selected') );
+    $filters.forEach(($filter) => { $filter.classList.remove('selected'); });
     const $selectedHref = $filters.find( $filter => $filter.href === location.href );
     $selectedHref ? $selectedHref.classList.add('selected') : $('a[href="#/"]').classList.add('selected');
     if ($('a.selected').textContent === "All") return this.render();
@@ -125,10 +125,10 @@ class TodoApp{
     $todoList.innerHTML = '';
     renderList.forEach((todoItem) => {
       const $li = document.createElement('li');
-      if (todoItem.isFinished == true) $li.classList.add('completed');
+      if (todoItem.isFinished === true) $li.classList.add('completed');
       $li.innerHTML = `
         <div class="view" data-idx=${todoItem.idx}>
-          <input class="toggle" type="checkbox" ${todoItem.isFinished == true ? 'checked' : ''} />
+          <input class="toggle" type="checkbox" ${todoItem.isFinished === true ? 'checked' : ''} />
           <label>${todoItem.value}</label>
           <button class="destroy"></button>
         </div>
@@ -144,7 +144,7 @@ class TodoApp{
 
   renderWithFiltering() {
     let filteredLists = [];
-    $('a.selected').textContent === "Active" ? filteredLists = this.getStorage().filter(({ isFinished }) => { return isFinished == false; }) : filteredLists = this.getStorage().filter(({ isFinished }) => { return isFinished == true; });
+    $('a.selected').textContent === "Active" ? filteredLists = this.getStorage().filter(({ isFinished }) => { return isFinished === false; }) : filteredLists = this.getStorage().filter(({ isFinished }) => { return isFinished === true; });
     this.render(filteredLists);
   }
 

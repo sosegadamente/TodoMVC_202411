@@ -42,9 +42,9 @@ class TodoApp{
     incompletedList.length === 1 ? $todoCount.innerHTML = '<span class="todo-count"><strong>1</strong> item left</span>' : $todoCount.innerHTML = `<span class="todo-count"><strong>${incompletedList.length}</strong> items left</span>`;
   }
 
-  deleteTodo(event) {
+  deleteTodo(eventTarget) {
     const currentTodoList = this.getStorage();
-    const deleteTarget = +event.target.closest('.view').dataset.idx;
+    const deleteTarget = +eventTarget.closest('.view').dataset.idx;
     const updateTodoList = currentTodoList.filter(({ idx }) => { return idx !== deleteTarget });
     this.setStorage(updateTodoList);
     this.isZero();
@@ -59,7 +59,7 @@ class TodoApp{
     $li.classList.add('editing');
     $li.append($input);
     $input.onblur = (e) => { this.editBlur(e); }
-    // $input.onkeydown = (e) => { this.updateStorage(e); }
+    $input.onkeydown = (e) => { this.updateStorage(e); }
   }
 
   editBlur(event) {
@@ -68,7 +68,8 @@ class TodoApp{
   }
 
   updateStorage(event) {
-    if (event.keyCode !== 13 || !event.target.value.trim()) return;
+    if (event.keyCode !== 13) return;
+    if (event.keyCode === 13 && event.target.value == "") return this.deleteTodo(event.target.closest('li').querySelector('button'));
     const $dataIdx = +event.target.closest('li').querySelector('.view').dataset.idx;
     const currentTodoList = this.getStorage();
     const updateTodoList = currentTodoList.map((item) => {
@@ -134,7 +135,7 @@ class TodoApp{
         </div>
       `;
       $li.querySelector('input').onclick = (e) => { this.changeStatus(e); }
-      $li.querySelector('button').onclick = (e) => { this.deleteTodo(e); }
+      $li.querySelector('button').onclick = (e) => { this.deleteTodo(e.target); }
       $li.ondblclick = (e) => { this.editTodo(e); }
       $todoList.append($li);
     });

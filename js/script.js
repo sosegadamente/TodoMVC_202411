@@ -59,7 +59,7 @@ class TodoApp{
     $li.classList.add('editing');
     $li.append($input);
     $input.onblur = (e) => { this.editBlur(e); }
-    $input.onkeydown = (e) => { this.updateStorage(e); }
+    // $input.onkeydown = (e) => { this.updateStorage(e); }
   }
 
   editBlur(event) {
@@ -138,6 +138,7 @@ class TodoApp{
       $li.ondblclick = (e) => { this.editTodo(e); }
       $todoList.append($li);
     });
+    !$('.completed') ? $('.clear-completed').style.display = "none" : $('.clear-completed').style.display = "block" ;
     this.toggleAllStatus();
     this.numberLeftTodoList();
   }

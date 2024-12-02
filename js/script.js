@@ -49,6 +49,13 @@ class TodoAppRefactoring{
   }
 }
 
+const getStorage = () => {
+  return JSON.parse(localStorage.getItem('list')) ?? [];
+}
+
+const setStorage = (list) => {
+  localStorage.setItem('list', JSON.stringify(list));
+}
 
 // NOTE: 의준 코드
 class TodoApp{
@@ -107,10 +114,11 @@ class TodoApp{
   editTodo(event) {
     const $li = event.target.closest('li');
     const $input = !$li.querySelector('input.edit') ? document.createElement('input') : $li.querySelector('input.edit');
-    $input.value = $li.querySelector('label').textContent;
     $input.classList.add("edit");
-    $li.classList.add('editing');
     $li.append($input);
+    $input.value = $li.querySelector('label').textContent;
+    $li.classList.add('editing');
+    $input.focus();
     $input.onblur = (e) => { this.editBlur(e); }
     $input.onkeydown = (e) => { this.updateStorage(e); }
   }

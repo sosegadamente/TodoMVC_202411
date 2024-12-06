@@ -1,76 +1,15 @@
-/* NOTE: 로컬 스토리지 같이 자주 사용하는 함수들은 별도로 분리해두는게 보기 좋음 */
-const storage = Object.freeze({
-  get:(key,initState) => JSON.parse(localStorage.getItem(key)) ?? initState,
-  set:(key,state) => localStorage.setItem(key,JSON.stringify(state))
-});
-
-/*** NOTE: TodoApp의 전체적인 State 값들을 확인하기가 어려움
- *  현재의 구조로는 투두리스트 데이터를 가지고 있는 상태 값의 호출이 뒤죽박죽임
- *  매 함수마다 getStorage 함수를 호출해서 값을 로드하는 성격을 가지고 있음 
- *  
- *  상태(데이터) 기반 렌더링을 하면 이러한 복잡함을 해결 할 수 있음
- *  그리고 꼭 클래스 기반으로 입력하지 않아도됨
- **/
-class TodoAppRefactoring{
-  constructor(){
-    this.state = storage.get('todoApp',{ todos:[], todoText:'' })
-  }
-
-  // NOTE: state의 모든 값은 setState를 통해 변경을 진행하고, 값이 변경될 때마다 storage에 업로드됨 / 그리고 상태기반 렌더링
-  setState(updateState){
-    this.state = {...structuredClone(this.state), ...updateState}
-    storage.set('todoApp',this.state)
-
-    this.rendering()
-  }
-
-  todoInput(event){
-    this.setState({ todoText:event.target.value }); // 인풋을 입력할 때마다 todoText 값 업데이트 
-  }
-
-  addTodo({keyCode}){
-    const isCreated = keyCode === 13 && this.state.todoText.trim().length
-    if(!isCreated) return  // NOTE: 엔터이며, 텍스트가 아닐때는 생성에서 제외
-
-    const todoItem = { 
-      name:this.state.todoText,
-      completed:false,
-      edited:false
-    }
-
-    this.setState({
-      todos:[ ...this.state.todos, todoItem],
-      todoText:'',
-    });
-  }
-
-  rendering(){
-    // this.state.todos 
-  }
-}
-
-const getStorage = () => {
-  return JSON.parse(localStorage.getItem('list')) ?? [];
-}
-
-const setStorage = (list) => {
-  localStorage.setItem('list', JSON.stringify(list));
-}
-
-// NOTE: 의준 코드
 class TodoApp{
   constructor() {
-    this.isZero();
     this.renderController();
     this.setEvents();
   }
 
   getStorage() {
-    return JSON.parse(localStorage.getItem('list')) ?? [];
+    return JSON.parse(localStorage.getItem('todos')) ?? [];
   }
 
-  setStorage(list) {
-    localStorage.setItem('list', JSON.stringify(list));
+  setStorage(todos) {
+    localStorage.setItem('todos', JSON.stringify(todos));
   }
 
   isZero() {
@@ -90,7 +29,6 @@ class TodoApp{
     currentTodoList.push(formattedTodoForm);
     this.setStorage(currentTodoList);
     this.renderController();
-    this.isZero();
     $newTodo.value = "";
   }
 
@@ -107,7 +45,6 @@ class TodoApp{
     const deleteTarget = +eventTarget.closest('.view').dataset.idx;
     const updateTodoList = currentTodoList.filter(({ idx }) => { return idx !== deleteTarget });
     this.setStorage(updateTodoList);
-    this.isZero();
     this.renderController();
   }
 
@@ -170,10 +107,10 @@ class TodoApp{
     const updateTodoList = currentTodoList.filter(({ isFinished }) => { return isFinished === false; });
     this.setStorage(updateTodoList);
     this.renderController();
-    this.isZero();
   }
 
   renderController() {
+    this.isZero();
     const $filters = [...$$('.filters li a')];
     $filters.forEach(($filter) => { $filter.classList.remove('selected'); });
     const $selectedHref = $filters.find( $filter => $filter.href === location.href );

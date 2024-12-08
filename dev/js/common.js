@@ -77,7 +77,7 @@ function rendering() {
     const $div = document.createElement("div");
 
     const $span = document.createElement("span");
-    $span.innerText = todoItem.name;
+    $span.innerText = todoItem.name;  
 
     const $button = document.createElement("button");
     $button.innerText = "삭제";

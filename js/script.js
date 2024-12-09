@@ -21,13 +21,13 @@ class TodoApp {
 
   deleteTodo(eventTarget) {
     const deleteTarget = +eventTarget.closest('.view').dataset.idx;
-    const updatedTodos = this.state.todos.filter(item => deleteTarget !== item.idx);
+    const updatedTodos = this.state.todos.filter(({ idx }) => deleteTarget !== idx);
     this.setStorage({ todos: updatedTodos });
   }
 
   changeState({ target }) {
-    const changeIdx = +target.closest('.view').dataset.idx;
-    const updateTodos = this.state.todos.map(item => item.idx === changeIdx ? { ...item, isFinished: !item.isFinished } : item);
+    const changeTarget = +target.closest('.view').dataset.idx;
+    const updateTodos = this.state.todos.map(item => item.idx === changeTarget ? { ...item, isFinished: !item.isFinished } : item);
     this.setStorage({ todos: updateTodos });
   }
 
@@ -53,13 +53,13 @@ class TodoApp {
     if (event.keyCode === 13 && !event.target.value.trim()) return this.deleteTodo(event.target.closest('li').querySelector('button'));
     const changeIdx = +event.target.closest('li').querySelector('.view').dataset.idx;
     const updateTodos = this.state.todos.map(item => item.idx === changeIdx ? { ...item, value: event.target.value } : item);
-    this.setStorage({ todos: updateTodos })
+    this.setStorage({ todos: updateTodos });
   }
 
   renderController() {
     const $filters = [...$$('.filters li a')];
-    $filters.forEach(($filter) => { $filter.classList.remove('selected'); });
-    const $selectedHref = $filters.find( $filter => $filter.href === location.href );
+    $filters.forEach($filter => { $filter.classList.remove('selected'); });
+    const $selectedHref = $filters.find($filter => $filter.href === location.href);
     $selectedHref ? $selectedHref.classList.add('selected') : $('a[href="#/"]').classList.add('selected');
     if ($('a.selected').textContent === "All") return this.render();
     let filteredLists = [];
@@ -69,7 +69,7 @@ class TodoApp {
 
   render(todoList = this.state.todos) {
     $('.todo-list').innerHTML = "";
-    todoList.forEach((todoItem) => {
+    todoList.forEach(todoItem => {
       const $li = document.createElement('li');
       if (todoItem.isFinished) $li.classList.add('completed');
       $li.innerHTML = `
@@ -96,15 +96,13 @@ class TodoApp {
   }
 
   clearCompleted() {
-    this.setStorage({ todos: this.state.todos.filter(todo => !todo.isFinished) });
+    this.setStorage({ todos: this.state.todos.filter(({ isFinished }) => !isFinished) });
   }
   
   numberLeftTodoList() {
     let incompletedList = [];
-    const currentTodoList = this.state.todos;
-    const $todoCount = $('.todo-count');
-    currentTodoList.forEach((item) => { if (item.isFinished === false) incompletedList.push(item); });
-    incompletedList.length === 1 ? $todoCount.innerHTML = '<span class="todo-count"><strong>1</strong> item left</span>' : $todoCount.innerHTML = `<span class="todo-count"><strong>${incompletedList.length}</strong> items left</span>`;
+    this.state.todos.forEach((item) => { if (item.isFinished === false) incompletedList.push(item); });
+    incompletedList.length === 1 ? $('.todo-count').innerHTML = '<span class="todo-count"><strong>1</strong> item left</span>' : $('.todo-count').innerHTML = `<span class="todo-count"><strong>${ incompletedList.length }</strong> items left</span>`;
   }
 
   isZero() {
@@ -113,16 +111,16 @@ class TodoApp {
   }
 
   toggleAll() {
-    const isAllFinished = this.state.todos.every(todo => todo.isFinished);
+    const isAllFinished = this.state.todos.every(({ isFinished }) => isFinished);
     const updatedTodos = this.state.todos.map(todo => ({ ...todo, isFinished: !isAllFinished }));
     this.setStorage({ todos: updatedTodos });
   }
 
   setEvents() {
     document.onkeydown = (e) => this.addTodo(e);
+    window.onhashchange = () => this.renderController();
     $('.clear-completed').onclick = () => this.clearCompleted();
     $('#toggle-all').onchange = () => this.toggleAll();
-    window.onhashchange = () => this.renderController();
   }
 }
 

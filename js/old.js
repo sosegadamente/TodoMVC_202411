@@ -68,10 +68,9 @@ class TodoApp{
   updateStorage(event) {
     if (event.keyCode !== 13) return;
     if (event.keyCode === 13 && event.target.value == "") return this.deleteTodo(event.target.closest('li').querySelector('button'));
-    const $dataIdx = +event.target.closest('li').querySelector('.view').dataset.idx;
     const currentTodoList = this.getStorage();
     const updateTodoList = currentTodoList.map((item) => {
-      if (item.idx === $dataIdx) item.value = event.target.value;
+      if (item.idx === +event.target.closest('li').querySelector('.view').dataset.idx) item.value = event.target.value;
       return item;
     });
     this.setStorage(updateTodoList);

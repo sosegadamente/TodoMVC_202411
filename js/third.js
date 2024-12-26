@@ -6,7 +6,6 @@ const todoApp = () => {
   const $todoCount = $(".todo-count");
   const $clearCompleted = $(".clear-completed");
   const $filterItems = [...$$(".filters a")];
-
   const getStorage = () => { return JSON.parse(localStorage.getItem("todos")) ?? { todos: [] }; };
   const setStorage = (todo) => { localStorage.setItem("todos", JSON.stringify(todo)); };
   let state = getStorage();
@@ -28,8 +27,7 @@ const todoApp = () => {
     }
     editTodo({ target }) {
       const $li = target.closest('li');
-      const $input = !$li.querySelector('input.edit') ? document.createElement('input') : $li.querySelector('input.edit');
-      $input.classList.add('edit');
+      const $input = !$li.querySelector('input.edit') ? $createElement('li', { classList: 'edit' }) : $li.querySelector('input.edit');
       $li.append($input);
       $input.value = $li.querySelector('label').textContent;
       $li.classList.add('editing');
@@ -82,7 +80,6 @@ const todoApp = () => {
     setStorage(state);
     renderCtrl();
   }
-
   function renderCtrl() {
     $filterItems.forEach(($filter) => { $filter.classList.remove('selected') });
     const $selectedHref = $filterItems.find(($filter) => $filter.href === location.href);
@@ -91,7 +88,6 @@ const todoApp = () => {
     const filteredList = $('a.selected').textContent === "Active" ? state.todos.filter(({ isFinished }) => { return isFinished === false; }) : state.todos.filter(({ isFinished }) => { return isFinished === true; });
     render(filteredList);
   }
-
   function render(renderList = state.todos) {
     $todoList.innerHTML = "";
     renderList.forEach((todoItem) => {
@@ -108,12 +104,11 @@ const todoApp = () => {
       $li.ondblclick = (e) => todoServices.editTodo(e);
       $todoList.append($li);
     });
-    !$('.completed') ? $('.clear-completed').style.display = "none" : $('.clear-completed').style.display = "block" ;
+    !$('.completed') ? $('.clear-completed').style.display = "none" : $('.clear-completed').style.display = "block";
     todoServices.todoCount();
     todoServices.toggleAllState();
     todoServices.isZero();
   }
-
   function eventCtrl () {
     $todoInput.onkeydown = (e) => todoServices.addTodo(e);
     $clearCompleted.onclick = () => todoServices.clearCompleted();

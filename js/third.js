@@ -27,7 +27,8 @@ const todoApp = () => {
     }
     editTodo({ target }) {
       const $li = target.closest('li');
-      const $input = !$li.querySelector('input.edit') ? $createElement('li', { classList: 'edit' }) : $li.querySelector('input.edit');
+      const $input = !$li.querySelector('input.edit') ? document.createElement('input') : $li.querySelector('input.edit');
+      $input.classList.add('edit');
       $li.append($input);
       $input.value = $li.querySelector('label').textContent;
       $li.classList.add('editing');

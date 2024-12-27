@@ -9,7 +9,7 @@ const todoApp = () => {
     renderCtrl();
   }
 
-  class TodoServices {
+  class TodoCtrl {
     createTodo(value) {
       return { idx: crypto.randomUUID(), isFinished: false, value };
     }
@@ -44,10 +44,10 @@ const todoApp = () => {
       return state.todos.length;
     }
     get isAllFinished() {
-      return state.todos.every(({ isFinished }) => { return isFinished === true });
+      return state.todos.every(({ isFinished }) => { return isFinished === true; });
     }
   }
-  const todoServices = new TodoServices();
+  const todoServices = new TodoCtrl();
 
   function editTodo ({ target }) {
     const $li = target.closest('li');
@@ -66,7 +66,7 @@ const todoApp = () => {
       if (e.keyCode === 13 && !e.target.value.trim()) return todoServices.deleteTodo(e.target.closest('li').querySelector('button'));
       todoServices.editUpdate(e);
     };
-  }
+  };
   function renderCtrl() {
     [...$$('.filters a')].forEach(($filter) => { $filter.classList.remove('selected'); });
     const $selectedHref = [...$$('.filters a')].find(($filter) => $filter.href === location.href);
@@ -74,7 +74,7 @@ const todoApp = () => {
     if ($('a.selected').textContent === "All") return render();
     const filteredList = $('a.selected').textContent === "Active" ? state.todos.filter(({ isFinished }) => { return isFinished === false; }) : state.todos.filter(({ isFinished }) => { return isFinished === true; });
     render(filteredList);
-  }
+  };
   function render(renderList = state.todos) {
     $('.todo-list').innerHTML = "";
     renderList.forEach((todoItem) => {
@@ -96,23 +96,23 @@ const todoApp = () => {
     $('label[for="toggle-all"]').classList.toggle('hidden', todoServices.todoLength === 0);
     todoServices.todoCount === 1 ? $('.todo-count').innerHTML = '<span class="todo-count"><strong>1</strong> item left</span>' : $('.todo-count').innerHTML = `<span class="todo-count"><strong>${ todoServices.todoCount }</strong> items left</span>`;
     todoServices.isAllFinished === true ? $('.toggle-all').checked = true : $('.toggle-all').checked = false;
-  }
+  };
   function eventCtrl() {
     $('.new-todo').onkeydown = (e) => {
       if (e.keyCode !== 13 || !e.target.value.trim()) return;
       todoServices.addTodo(e);
       e.target.value = "";
-    }
+    };
     $('.clear-completed').onclick = () => {
       todoServices.clearCompleted();
-    }
+    };
     $('.toggle-all').onchange = () => {
       todoServices.toggleAll();
-    }
+    };
     window.onhashchange = () => {
       renderCtrl();
-    }
-  }
+    };
+  };
 
   renderCtrl();
   eventCtrl();

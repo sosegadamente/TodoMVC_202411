@@ -67,6 +67,7 @@ const todoApp = () => {
       todoServices.editUpdate(e);
     };
   };
+
   function renderCtrl() {
     [...$$('.filters a')].forEach(($filter) => { $filter.classList.remove('selected'); });
     const $selectedHref = [...$$('.filters a')].find(($filter) => $filter.href === location.href);
@@ -75,6 +76,7 @@ const todoApp = () => {
     const filteredList = $('a.selected').textContent === "Active" ? state.todos.filter(({ isFinished }) => { return isFinished === false; }) : state.todos.filter(({ isFinished }) => { return isFinished === true; });
     render(filteredList);
   };
+  
   function render(renderList = state.todos) {
     $('.todo-list').innerHTML = "";
     renderList.forEach((todoItem) => {
@@ -98,21 +100,10 @@ const todoApp = () => {
     todoServices.isAllFinished === true ? $('.toggle-all').checked = true : $('.toggle-all').checked = false;
   };
   function eventCtrl() {
-    $('.new-todo').onkeydown = (e) => {
-      if (e.keyCode !== 13 || !e.target.value.trim()) return;
-      if (e.target.value.startsWith('<s')) return alert('Error Occurred');
-      todoServices.addTodo(e);
-      e.target.value = "";
-    };
-    $('.clear-completed').onclick = () => {
-      todoServices.clearCompleted();
-    };
-    $('.toggle-all').onchange = () => {
-      todoServices.toggleAll();
-    };
-    window.onhashchange = () => {
-      renderCtrl();
-    };
+    $('.new-todo').onkeydown = (e) => { if (e.keyCode === 13 && e.target.value.trim() && !e.target.value.startsWith('<s')) { todoServices.addTodo(e); e.target.value = "";} };
+    $('.clear-completed').onclick = () => { todoServices.clearCompleted(); };
+    $('.toggle-all').onchange = () => { todoServices.toggleAll(); };
+    window.onhashchange = () => { renderCtrl(); };
   };
 
   renderCtrl();

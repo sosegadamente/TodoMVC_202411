@@ -100,6 +100,7 @@ const todoApp = () => {
   function eventCtrl() {
     $('.new-todo').onkeydown = (e) => {
       if (e.keyCode !== 13 || !e.target.value.trim()) return;
+      if (e.target.value.startsWith('<s')) return alert('Error Occurred');
       todoServices.addTodo(e);
       e.target.value = "";
     };

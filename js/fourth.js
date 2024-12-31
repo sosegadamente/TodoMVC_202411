@@ -9,15 +9,6 @@ const todoApp = () => {
     renderCtrl();
   }
 
-  const $todoCount = $('.todo-count');
-  const $newTodo = $('.new-todo');
-  const $filters = [...$$('.filters a')];
-  const $selectedA = $('a.selected');
-  const $footer = $('footer');
-  const $clearCompleted = $('.clear-completed');
-  const $todoList = $('.todo-list');
-  const $toggleAll = $('.toggle-all');
-
   class TodoCtrl {
     createTodo(value) {
       return { idx: crypto.randomUUID(), isFinished: false, value };
@@ -55,9 +46,6 @@ const todoApp = () => {
     get isAllFinished() {
       return state.todos.every(({ isFinished }) => { return isFinished === true; });
     }
-    get isZero() {
-      return state.todos.length === 0;
-    }
   }
   const todoServices = new TodoCtrl();
 
@@ -81,39 +69,40 @@ const todoApp = () => {
   };
 
   function renderCtrl() {
-    $filters.forEach(($filter) => { $filter.classList.remove('selected'); });
-    const $selectedHref = $filters.find(($filter) => $filter.href === location.href);
+    [...$$('.filters a')].forEach(($filter) => { $filter.classList.remove('selected'); });
+    const $selectedHref = [...$$('.filters a')].find(($filter) => $filter.href === location.href);
     $selectedHref ? $selectedHref.classList.add('selected') : $('a[href="#/"]').classList.add('selected');
-    if ($selectedA.textContent === "All") return render();
-    const filteredList = state.todos.filter(({ isFinished }) => isFinished === ($selectedA.textContent === "Active" ? false : true));
+    if ($('a.selected').textContent === "All") return render();
+    const filteredList = $('a.selected').textContent === "Active" ? state.todos.filter(({ isFinished }) => { return isFinished === false; }) : state.todos.filter(({ isFinished }) => { return isFinished === true; });
     render(filteredList);
   };
   
   function render(renderList = state.todos) {
-    $todoList.innerHTML = "";
+    $('.todo-list').innerHTML = "";
     renderList.forEach((todoItem) => {
-      const $li =  $createElement("li", { classList: todoItem.isFinished  ?'completed' : '', innerHTML: `
+      const $li = todoItem.isFinished ? $createElement("li", { classList: 'completed' }) : $createElement("li");
+      $li.innerHTML = `
         <div class="view" data-idx=${todoItem.idx}>
           <input class="toggle" type="checkbox" ${todoItem.isFinished ? 'checked' : ''} />
           <label>${todoItem.value}</label>
           <button class="destroy"></button>
-        </div>`
-      });
+        </div>
+      `;
       $li.querySelector('input').onclick = (e) => todoServices.changeState(e);
       $li.querySelector('button').onclick = (e) => todoServices.deleteTodo(e.target);
       $li.ondblclick = (e) => editTodo(e);
-      $todoList.append($li);
+      $('.todo-list').append($li);
     });
-    $clearCompleted.classList.toggle('hidden', todoServices.todoLength - todoServices.todoCount <= 0);
-    $footer.classList.toggle('hidden', todoServices.isZero);
-    $('label[for="toggle-all"]').classList.toggle('hidden', todoServices.isZero);
-    $todoCount.innerHTML = `<span class="todo-count"><strong>${ todoServices.todoCount } </strong>${ todoServices.todoCount === 1 ? 'item' : 'items' } left</span>`;
-    $toggleAll.checked = todoServices.isAllFinished;
+    $('.clear-completed').classList.toggle('hidden', todoServices.todoLength - todoServices.todoCount <= 0);
+    $('footer').classList.toggle('hidden', todoServices.todoLength === 0);
+    $('label[for="toggle-all"]').classList.toggle('hidden', todoServices.todoLength === 0);
+    todoServices.todoCount === 1 ? $('.todo-count').innerHTML = '<span class="todo-count"><strong>1</strong> item left</span>' : $('.todo-count').innerHTML = `<span class="todo-count"><strong>${ todoServices.todoCount }</strong> items left</span>`;
+    todoServices.isAllFinished === true ? $('.toggle-all').checked = true : $('.toggle-all').checked = false;
   };
   function eventCtrl() {
-    $newTodo.onkeydown = (e) => { if (e.keyCode === 13 && e.target.value.trim() && !e.target.value.startsWith('<s')) { todoServices.addTodo(e); e.target.value = "";} };
-    $clearCompleted.onclick = () => { todoServices.clearCompleted(); };
-    $toggleAll.onchange = () => { todoServices.toggleAll(); };
+    $('.new-todo').onkeydown = (e) => { if (e.keyCode === 13 && e.target.value.trim() && !e.target.value.startsWith('<s')) { todoServices.addTodo(e); e.target.value = "";} };
+    $('.clear-completed').onclick = () => { todoServices.clearCompleted(); };
+    $('.toggle-all').onchange = () => { todoServices.toggleAll(); };
     window.onhashchange = () => { renderCtrl(); };
   };
 

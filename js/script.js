@@ -20,7 +20,7 @@ const todoApp = () => {
 
   class TodoCtrl {
     createTodo(value) {
-      return { idx: crypto.randomUUID(), isFinished: false, value };
+      return { idx: crypto.randomUUID(), isEditing: false, isFinished: false, value };
     }
     addTodo({ target }) {
       const todos = [...state.todos, this.createTodo(target.value)];
@@ -70,8 +70,8 @@ const todoApp = () => {
     $li.classList.add('editing');
     $input.focus();
     $input.onblur = (e) => {
-      e.target.closest('li').classList.remove('editing');
-      e.target.remove();
+      if (!e.target.value.trim()) return todoServices.deleteTodo(e.target.closest('li').querySelector('button'));
+      todoServices.editUpdate(e);
     };
     $input.onkeydown = (e) => {
       if (e.keyCode !== 13) return;
